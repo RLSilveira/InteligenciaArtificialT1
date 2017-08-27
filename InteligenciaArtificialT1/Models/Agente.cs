@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using InteligenciaArtificialT1.Models;
 
 namespace InteligenciaArtificialT1
 {
@@ -14,15 +15,33 @@ namespace InteligenciaArtificialT1
 
 
         public int Repositorio { get; set; }
+        public Ambiente Ambiente { get; set; }
 
         public Agente()
         {
-            
+
         }
 
         public void run()
         {
 
+            var adjascentes = Ambiente.getAdjascentes();
+
+
+
+
+            // varrer o mapa
+
+            // ir para lixeira
+
+            // is para ponto recarga
+
+        }
+
+
+        private int Heuristica()
+        {
+            return 0;
         }
 
         public override string ToString()
