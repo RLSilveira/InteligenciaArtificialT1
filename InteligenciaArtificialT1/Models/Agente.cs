@@ -29,7 +29,8 @@ namespace InteligenciaArtificialT1
         {
             var bDireita = true;
             var tam = Ambiente.getTamanho();
-            var visitados = new List<Ambiente.Ponto>(Ambiente.getTamanho());
+            var visitados = new Stack<Ambiente.Ponto>(Ambiente.getTamanho());
+
 
             var lastX = 0;
             int count = 0;
@@ -51,9 +52,37 @@ namespace InteligenciaArtificialT1
                 if (p == null)
                 {
                     // sem saida
+                    Ambiente.Ponto l;
+                    while (visitados.Count > 0 && p == null)
+                    {
+                        l = visitados.Pop();
+                        Ambiente.Move(l);
+
+                        prox = Ambiente.getAdjscentesOrdenados(bDireita);
+                        for (int i = 0; i < prox.Length; i++)
+                        {
+                            if (prox[i] != null && prox[i] != l && !visitados.Contains(prox[i]) && (prox[i].Item == null || prox[i].Item is Sujeira))
+                            {
+                                p = prox[i];
+                                break;
+                            }
+                        }
+                    }
+
                 }
 
-                if (p == null) throw new Exception("Não sei para onde ir.");
+                if (p == null)
+                {
+                    if (visitados.Count == 0)
+                    {
+                        Console.WriteLine("Terminei !!!");
+                        return;
+                    }
+                    else
+                    {
+                        throw new Exception("Não sei para onde ir.");
+                    }
+                }
 
                 //if (p.Item is Parede) continue;
                 //if (p.Item is Recarga) continue;
@@ -62,7 +91,7 @@ namespace InteligenciaArtificialT1
 
                 if (visitados.Contains(p)) continue;
 
-                visitados.Add(p);
+                visitados.Push(p);
                 Ambiente.Move(p);
 
                 if (lastX >= p.Y)
