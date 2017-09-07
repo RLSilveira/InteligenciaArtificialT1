@@ -88,6 +88,7 @@ namespace InteligenciaArtificialT1
                     {
                         // Modo contorno
                         Contornar(bDesce);
+                        continue;
                     }
 
                     ultimaPosicao = p;
@@ -112,16 +113,19 @@ namespace InteligenciaArtificialT1
             if (bDesce)
             {
                 var p = Ambiente.getBaixoEsquerda();
-
-                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
-                {
-                    p = Ambiente.getEsquerda();
-                }
+                esquerda = true;
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
                     p = Ambiente.getBaixoDireita();
+                }
+
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    esquerda = true;
+                    p = Ambiente.getEsquerda();
                 }
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
@@ -135,24 +139,24 @@ namespace InteligenciaArtificialT1
 
                 if (!esquerda)
                 {
-                    denovoEsquerda:
+                    DescendoVoltaEsquerda:
                     p = Ambiente.getBaixoEsquerda();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
                         p = Ambiente.getBaixo();
                         Ambiente.Move(p);
-                        goto denovoEsquerda;
+                        goto DescendoVoltaEsquerda;
                     }
                 }
                 else
                 {
-                    denovoDireita:
+                    DescendoVoltaDireita:
                     p = Ambiente.getBaixoDireita();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
                         p = Ambiente.getBaixo();
                         Ambiente.Move(p);
-                        goto denovoDireita;
+                        goto DescendoVoltaDireita;
                     }
 
                 }
@@ -160,19 +164,21 @@ namespace InteligenciaArtificialT1
                 Ambiente.Move(p);
 
             }
-            else
+            else // Sobe
             {
                 var p = Ambiente.getCimaEsquerda();
-
-                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
-                {
-                    p = Ambiente.getEsquerda();
-                }
+                esquerda = true;
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
                     p = Ambiente.getCimaDireita();
+                }
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    p = Ambiente.getEsquerda();
+                    esquerda = true;
                 }
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
@@ -181,29 +187,30 @@ namespace InteligenciaArtificialT1
                     p = Ambiente.getDireita();
                 }
 
+
                 Ambiente.Move(p);
 
 
                 if (!esquerda)
                 {
-                    denovoEsquerdad:
+                    SubindoVoltaEsquerda:
                     p = Ambiente.getCimaEsquerda();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
                         p = Ambiente.getCima();
                         Ambiente.Move(p);
-                        goto denovoEsquerdad;
+                        goto SubindoVoltaEsquerda;
                     }
                 }
                 else
                 {
+                    SubindoVoltaDireita:
                     p = Ambiente.getCimaDireita();
-                    denovoDireita:
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
                         p = Ambiente.getCima();
                         Ambiente.Move(p);
-                        goto denovoDireita;
+                        goto SubindoVoltaDireita;
                     }
 
                 }

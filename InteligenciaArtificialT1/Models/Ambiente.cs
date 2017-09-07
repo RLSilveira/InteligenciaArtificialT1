@@ -80,47 +80,44 @@ namespace InteligenciaArtificialT1.Models
             }
 
             var random = new Random();
-            Lixeiras.Add(mapa[(4 * tam) + 0] = new Ponto(4, 0, lixeiras[0]));
-            Lixeiras.Add(mapa[(5 * tam) + 0] = new Ponto(5, 0, lixeiras[0]));
 
+            //TODO: Gerar lixeiras e recargas apenas dentro das paredes
+            // gerar lixeiras
+            int idx = 0;
+            while (idx < lixeiras.Count && !isFull)
+            {
+                var r = random.Next(tam);
+                var c = random.Next(tam);
+                if (mapa[(r * tam) + c] == null)
+                {
+                    Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
+                }
+            }
 
-            ////TODO: Gerar lixeiras e recargas apenas dentro das paredes
-            //// gerar lixeiras
-            //int idx = 0;
-            //while (idx < lixeiras.Count && !isFull)
-            //{
-            //    var r = random.Next(tam);
-            //    var c = random.Next(tam);
-            //    if (mapa[(r * tam) + c] == null)
-            //    {
-            //        Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
-            //    }
-            //}
+            // gerar recargas
+            idx = 0;
+            while (idx < recargas.Count && !isFull)
+            {
+                var r = random.Next(tam);
+                var c = random.Next(tam);
+                if (mapa[(r * tam) + c] == null)
+                {
+                    Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
+                    ;
+                }
+            }
 
-            //// gerar recargas
-            //idx = 0;
-            //while (idx < recargas.Count && !isFull)
-            //{
-            //    var r = random.Next(tam);
-            //    var c = random.Next(tam);
-            //    if (mapa[(r * tam) + c] == null)
-            //    {
-            //        Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
-            //        ;
-            //    }
-            //}
-
-            //// gerar sujeiras
-            //idx = 0;
-            //while (idx < sujeiras.Count && !isFull)
-            //{
-            //    var r = random.Next(tam);
-            //    var c = random.Next(tam);
-            //    if (mapa[(r * tam) + c] == null)
-            //    {
-            //        mapa[(r * tam) + c] = new Ponto(r, c, sujeiras[idx++]);
-            //    }
-            //}
+            // gerar sujeiras
+            idx = 0;
+            while (idx < sujeiras.Count && !isFull)
+            {
+                var r = random.Next(tam);
+                var c = random.Next(tam);
+                if (mapa[(r * tam) + c] == null)
+                {
+                    mapa[(r * tam) + c] = new Ponto(r, c, sujeiras[idx++]);
+                }
+            }
 
         }
 
@@ -139,12 +136,9 @@ namespace InteligenciaArtificialT1.Models
 
         }
 
-        public List<Ponto> getAdjascentes()
+        private List<Ponto> getAdjascentes(int x, int y)
         {
             var nodes = new List<Ponto>(8);
-
-            var x = pAgente.X;
-            var y = pAgente.Y;
 
             for (int i = Math.Max(0, x - 1); i < pAgente.X + 2; i++)
             {
@@ -152,7 +146,7 @@ namespace InteligenciaArtificialT1.Models
                 {
                     var n = mapa[(i * tam) + j];
 
-                    if (n == pAgente) continue;
+                    //if (n == pAgente) continue;
 
                     nodes.Add(n ?? new Ponto(i, j, null));
                 }
