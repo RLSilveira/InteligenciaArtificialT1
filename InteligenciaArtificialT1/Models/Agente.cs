@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using InteligenciaArtificialT1.Models;
 
@@ -25,93 +26,191 @@ namespace InteligenciaArtificialT1
 
 
 
-        public void run()
+        public void Run()
         {
             var bDireita = true;
             var tam = Ambiente.getTamanho();
-            var visitados = new Stack<Ambiente.Ponto>(Ambiente.getTamanho());
 
+            Ambiente.Ponto ultimaPosicao = Ambiente.getAgentePosicao();
 
-            var lastX = 0;
-            int count = 0;
-            while (count++ < tam * 3)
+            int col = ultimaPosicao.X;
+            var bDesce = true;
+
+            Ambiente.Ponto p = null;
+
+            while (true)
             {
 
-                Ambiente.Ponto p = null;
-
-                var prox = Ambiente.getAdjscentesOrdenados(bDireita);
-                for (int i = 0; i < prox.Length; i++)
+                if (bDesce)
                 {
-                    if (prox[i] != null && !visitados.Contains(prox[i]) && (prox[i].Item == null || prox[i].Item is Sujeira))
-                    {
-                        p = prox[i];
-                        break;
-                    }
-                }
+                    p = Ambiente.getBaixo();
 
-                if (p == null)
-                {
-                    // sem saida
-                    Ambiente.Ponto l;
-                    while (visitados.Count > 0 && p == null)
+                    if (p == null)
                     {
-                        l = visitados.Pop();
-                        Ambiente.Move(l);
+                        // fim do mapa
+                        p = Ambiente.getDireita();
+                        bDesce = false;
 
-                        prox = Ambiente.getAdjscentesOrdenados(bDireita);
-                        for (int i = 0; i < prox.Length; i++)
+                        if (p == null)
                         {
-                            if (prox[i] != null && prox[i] != l && !visitados.Contains(prox[i]) && (prox[i].Item == null || prox[i].Item is Sujeira))
-                            {
-                                p = prox[i];
-                                break;
-                            }
-                        }
+                            break; // Fim
+                        };
                     }
 
-                }
+                    if (p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                    {
+                        // Modo contorno
+                        Contornar(bDesce);
+                        continue;
+                    }
 
-                if (p == null)
+                    ultimaPosicao = p;
+                    Ambiente.Move(p);
+
+                }
+                else
                 {
-                    if (visitados.Count == 0)
+                    p = Ambiente.getCima();
+
+                    if (p == null)
                     {
-                        Console.WriteLine("Terminei !!!");
-                        return;
+                        // fim do mapa
+                        p = Ambiente.getDireita();
+                        bDesce = true;
+
+                        if (p == null)
+                        {
+                            break; // Fim
+                        };
                     }
-                    else
+
+                    if (p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
-                        throw new Exception("Não sei para onde ir.");
+                        // Modo contorno
+                        Contornar(bDesce);
                     }
+
+                    ultimaPosicao = p;
+                    Ambiente.Move(p);
                 }
 
-                //if (p.Item is Parede) continue;
-                //if (p.Item is Recarga) continue;
-                //if (p.Item is Lixeira) continue;
-
-
-                if (visitados.Contains(p)) continue;
-
-                visitados.Push(p);
-                Ambiente.Move(p);
-
-                if (lastX >= p.Y)
-                    bDireita = false;
-                else if (lastX <= p.Y)
-                    bDireita = true;
-
-                lastX = p.Y;
             }
 
+
+
+            // Verifica capacidade
+
+            // Verifica bateria
+
+            // Move para proxima casa
+
         }
-        // Verifica capacidade
 
-        // Verifica bateria
+        void Contornar(bool bDesce)
+        {
+            bool esquerda = true;
+            if (bDesce)
+            {
+                var p = Ambiente.getBaixoEsquerda();
 
-        // Move para proxima casa
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    p = Ambiente.getEsquerda();
+                }
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    esquerda = false;
+                    p = Ambiente.getBaixoDireita();
+                }
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    esquerda = false;
+                    p = Ambiente.getDireita();
+                }
+
+                Ambiente.Move(p);
 
 
+                if (!esquerda)
+                {
+                    denovoEsquerda:
+                    p = Ambiente.getBaixoEsquerda();
+                    if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                    {
+                        p = Ambiente.getBaixo();
+                        Ambiente.Move(p);
+                        goto denovoEsquerda;
+                    }
+                }
+                else
+                {
+                    denovoDireita:
+                    p = Ambiente.getBaixoDireita();
+                    if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                    {
+                        p = Ambiente.getBaixo();
+                        Ambiente.Move(p);
+                        goto denovoDireita;
+                    }
+
+                }
+
+                Ambiente.Move(p);
+
+            }
+            else
+            {
+                var p = Ambiente.getCimaEsquerda();
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    p = Ambiente.getEsquerda();
+                }
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    esquerda = false;
+                    p = Ambiente.getCimaDireita();
+                }
+
+                if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                {
+                    esquerda = false;
+                    p = Ambiente.getDireita();
+                }
+
+                Ambiente.Move(p);
 
 
+                if (!esquerda)
+                {
+                    denovoEsquerdad:
+                    p = Ambiente.getCimaEsquerda();
+                    if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                    {
+                        p = Ambiente.getCima();
+                        Ambiente.Move(p);
+                        goto denovoEsquerdad;
+                    }
+                }
+                else
+                {
+                    p = Ambiente.getCimaDireita();
+                    denovoDireita:
+                    if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
+                    {
+                        p = Ambiente.getCima();
+                        Ambiente.Move(p);
+                        goto denovoDireita;
+                    }
+
+                }
+
+                Ambiente.Move(p);
+            }
+        }
 
         private int Heuristica()
         {

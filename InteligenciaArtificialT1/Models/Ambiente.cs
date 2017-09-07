@@ -80,44 +80,47 @@ namespace InteligenciaArtificialT1.Models
             }
 
             var random = new Random();
+            Lixeiras.Add(mapa[(4 * tam) + 0] = new Ponto(4, 0, lixeiras[0]));
+            Lixeiras.Add(mapa[(5 * tam) + 0] = new Ponto(5, 0, lixeiras[0]));
 
-            //TODO: Gerar lixeiras e recargas apenas dentro das paredes
-            // gerar lixeiras
-            int idx = 0;
-            while (idx < lixeiras.Count && !isFull)
-            {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
-                {
-                    Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
-                }
-            }
 
-            // gerar recargas
-            idx = 0;
-            while (idx < recargas.Count && !isFull)
-            {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
-                {
-                    Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
-                    ;
-                }
-            }
+            ////TODO: Gerar lixeiras e recargas apenas dentro das paredes
+            //// gerar lixeiras
+            //int idx = 0;
+            //while (idx < lixeiras.Count && !isFull)
+            //{
+            //    var r = random.Next(tam);
+            //    var c = random.Next(tam);
+            //    if (mapa[(r * tam) + c] == null)
+            //    {
+            //        Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
+            //    }
+            //}
 
-            // gerar sujeiras
-            idx = 0;
-            while (idx < sujeiras.Count && !isFull)
-            {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
-                {
-                    mapa[(r * tam) + c] = new Ponto(r, c, sujeiras[idx++]);
-                }
-            }
+            //// gerar recargas
+            //idx = 0;
+            //while (idx < recargas.Count && !isFull)
+            //{
+            //    var r = random.Next(tam);
+            //    var c = random.Next(tam);
+            //    if (mapa[(r * tam) + c] == null)
+            //    {
+            //        Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
+            //        ;
+            //    }
+            //}
+
+            //// gerar sujeiras
+            //idx = 0;
+            //while (idx < sujeiras.Count && !isFull)
+            //{
+            //    var r = random.Next(tam);
+            //    var c = random.Next(tam);
+            //    if (mapa[(r * tam) + c] == null)
+            //    {
+            //        mapa[(r * tam) + c] = new Ponto(r, c, sujeiras[idx++]);
+            //    }
+            //}
 
         }
 
@@ -132,7 +135,7 @@ namespace InteligenciaArtificialT1.Models
 
             Console.Clear();
             Console.WriteLine(this);
-            System.Threading.Thread.Sleep(250);
+            System.Threading.Thread.Sleep(100);
 
         }
 
@@ -160,17 +163,17 @@ namespace InteligenciaArtificialT1.Models
         }
 
 
-        public Ponto getDireita() => getVizinho(1, 0);
-        public Ponto getEsquerda() => getVizinho(-1, 0);
+        public Ponto getDireita() => getVizinho(0, 1);
+        public Ponto getEsquerda() => getVizinho(0, -1);
 
-        public Ponto getCima() => getVizinho(0, 1);
-        public Ponto getBaixo() => getVizinho(0, -1);
+        public Ponto getCima() => getVizinho(-1, 0);
+        public Ponto getBaixo() => getVizinho(1, 0);
 
-        public Ponto getCimaEsquerda() => getVizinho(-1, 1);
-        public Ponto getBaixoEsquerda() => getVizinho(-1, -1);
+        public Ponto getCimaEsquerda() => getVizinho(-1, -1);
+        public Ponto getBaixoEsquerda() => getVizinho(1, -1);
 
-        public Ponto getCimaDireita() => getVizinho(1, 1);
-        public Ponto getBaixoDireita() => getVizinho(1, -1);
+        public Ponto getCimaDireita() => getVizinho(-1, 1);
+        public Ponto getBaixoDireita() => getVizinho(1, 1);
 
         private Ponto getVizinho(int offsetX, int offsetY)
         {
@@ -182,38 +185,25 @@ namespace InteligenciaArtificialT1.Models
             return mapa[(x * tam) + y] ?? new Ponto(pAgente.X + offsetX, pAgente.Y + offsetY, null);
         }
 
-        public Ponto[] getAdjscentesOrdenados(bool bDireita)
+        public Ponto[] getAdjscentesOrdenados(bool bInvert)
         {
 
-            return bDireita
+            //return new[] {getCima()};
+
+            var r = bInvert
                 ? new[]
                 {
-                    getCima(),
-                    getCimaDireita(),
-                    getDireita(),
-                    getBaixoDireita(),
-
-
-                    getCimaEsquerda(),
-                    getEsquerda(),
-                    getBaixoEsquerda(),
                     getBaixo(),
-                    
+                    getCima(),
+                    getDireita(),
                 }
                 : new[]
                 {
                     getCima(),
-                    getCimaEsquerda(),
-                    getEsquerda(),
-                    getBaixoEsquerda(),
-
-
-                    getCimaDireita(),
-                    getDireita(),
-                    getBaixoDireita(),
                     getBaixo(),
-
+                    getEsquerda(),
                 };
+            return r;
         }
 
         private bool isFull => mapa.Count(x => x == null) == 0;
@@ -238,5 +228,9 @@ namespace InteligenciaArtificialT1.Models
         }
 
 
+        public Ponto getAgentePosicao()
+        {
+            return pAgente;
+        }
     }
 }

@@ -45,7 +45,7 @@ namespace InteligenciaArtificialT1
 
             Console.WriteLine(a);
 
-            agente.run();
+            agente.Run();
 
             Console.WriteLine("Fim !!!");
             Console.ReadKey();
