@@ -88,9 +88,12 @@ namespace InteligenciaArtificialT1.Models
             {
                 var r = random.Next(tam);
                 var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
+                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == tam - 1) && r > row1 && r < row2)
                 {
-                    Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
+                    if (mapa[(r * tam) + c] == null)
+                    {
+                        Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
+                    }
                 }
             }
 
@@ -100,10 +103,13 @@ namespace InteligenciaArtificialT1.Models
             {
                 var r = random.Next(tam);
                 var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
+                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == tam - 1) && r > row1 && r < row2)
                 {
-                    Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
-                    ;
+                    if (mapa[(r * tam) + c] == null)
+                    {
+                        Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
+                        ;
+                    }
                 }
             }
 

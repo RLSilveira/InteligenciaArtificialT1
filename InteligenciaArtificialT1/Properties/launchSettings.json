@@ -2,7 +2,7 @@
   "profiles": {
     "InteligenciaArtificialT1": {
       "commandName": "Project",
-      "commandLineArgs": "12"
+      "commandLineArgs": "12 3 3"
     }
   }
 }
