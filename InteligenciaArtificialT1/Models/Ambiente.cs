@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 
 namespace InteligenciaArtificialT1.Models
 {
@@ -21,8 +23,7 @@ namespace InteligenciaArtificialT1.Models
 
             public override string ToString()
             {
-                //return $" {Item?.ToString() ?? "-"} ";
-                return Item.ToString();
+                return Item?.ToString();
             }
 
             public override bool Equals(object obj)
@@ -43,10 +44,13 @@ namespace InteligenciaArtificialT1.Models
 
         Ponto pAgente;
 
-        public Ambiente(int tamanho, Agente agente, List<Lixeira> lixeiras, List<Recarga> recargas, List<Sujeira> sujeiras)
+        public Ambiente(int tamanho, Agente agente, List<Lixeira> lixeiras, List<Recarga> recargas, double fatorSujeira)
         {
+
+
+
             Recargas = new List<Ponto>(recargas.Count);
-            Lixeiras = new List<Ponto>(sujeiras.Count);
+            Lixeiras = new List<Ponto>(lixeiras.Count);
 
             tam = tamanho;
             mapa = new Ponto[tam * tam];
@@ -114,6 +118,11 @@ namespace InteligenciaArtificialT1.Models
             }
 
             // gerar sujeiras
+            var qntSujeiras = mapa.Count(x => x == null) * fatorSujeira;
+            var sujeiras = new List<Sujeira>((int)qntSujeiras);
+            for (var i = 0; i < qntSujeiras; i++) sujeiras.Add(new Sujeira());
+
+
             idx = 0;
             while (idx < sujeiras.Count && !isFull)
             {
@@ -129,9 +138,20 @@ namespace InteligenciaArtificialT1.Models
 
         internal void Move(Ponto node)
         {
-            //if (node.Item is Sujeira)
+            switch (node.Item)
+            {
+                case Parede _:
+                case Recarga _:
+                case Lixeira _:
+                    throw new Exception("Não deveria chega aqui");
+                case Sujeira s:
+                    ((Agente)pAgente.Item).Repositorio += s.peso;
+                    break;
+            }
 
-            mapa[pAgente.X * tam + pAgente.Y] = new Ponto(pAgente.X, pAgente.Y, "*");
+            ((Agente)pAgente.Item).Bateria -= 1;
+
+            mapa[pAgente.X * tam + pAgente.Y] = new Ponto(pAgente.X, pAgente.Y, null);
             mapa[node.X * tam + node.Y] = pAgente;
             pAgente.X = node.X;
             pAgente.Y = node.Y;
@@ -142,19 +162,22 @@ namespace InteligenciaArtificialT1.Models
 
         }
 
-        private List<Ponto> getAdjascentes(int x, int y)
+        public List<Ponto> getAdjascentes(int x, int y)
         {
             var nodes = new List<Ponto>(8);
 
-            for (int i = Math.Max(0, x - 1); i < pAgente.X + 2; i++)
+            for (int i = Math.Max(0, x - 1); i < Math.Min(x + 2, tam); i++)
             {
-                for (int j = Math.Max(0, y - 1); j < pAgente.Y + 2; j++)
+                for (int j = Math.Max(0, y - 1); j < Math.Min(y + 2, tam); j++)
                 {
                     var n = mapa[(i * tam) + j];
 
-                    //if (n == pAgente) continue;
+                    if (i == x && j == y) continue;
 
-                    nodes.Add(n ?? new Ponto(i, j, null));
+                    if (n?.Item == null || n.Item is Sujeira)
+                    {
+                        nodes.Add(n ?? new Ponto(i, j, null));
+                    }
                 }
             }
 
@@ -210,7 +233,11 @@ namespace InteligenciaArtificialT1.Models
 
         public override string ToString()
         {
-            var r = "\t";
+            var r = "Inteligencia Artificial\n" +
+                    "Caetano\n" +
+                    "Pedro\n" +
+                    "Rodrigo\n" +
+                    "\n\t";
 
             for (int i = 0; i < tam; i++)
             {
@@ -222,6 +249,12 @@ namespace InteligenciaArtificialT1.Models
                 r += "\n\t";
 
             }
+
+            var agente = (Agente)pAgente.Item;
+
+            r += "\nInfos\n";
+            r += $"Bateria:     {agente.Bateria}/{agente.CapacidadeBateria}\n";
+            r += $"Repositorio: {agente.Repositorio}/{agente.CapacidadeRepositorio}\n";
 
             return r;
 

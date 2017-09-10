@@ -8,42 +8,42 @@ namespace InteligenciaArtificialT1
     {
         static void Main(string[] args)
         {
-            int TAM = 12; // Tamanho minimo
-            if (args.Length > 0) TAM = Math.Max(TAM, int.Parse(args[0]));
+            // Parametros
+            var iTamanho = 12; // Tamanho minimo
+            var iLixeiras = 1; // Lixeiras
+            var iRecargas = 1; // Pontos de Recargas
+            var fatorSujeira = 0.1; // Sujeira
+            var iRepositorio = 10; // Capacidade da Bateria
 
-            int iLixeiras = 1; // Lixeiras
-            if (args.Length > 1) iLixeiras = Math.Max(iLixeiras, int.Parse(args[1]));
+
+
+            foreach (var param in args)
+            {
+
+                if (param.StartsWith("/n:")) iTamanho = Math.Max(iTamanho, int.Parse(param.Replace("/n:", string.Empty)));
+
+                if (param.StartsWith("/l:")) iLixeiras = Math.Max(iLixeiras, int.Parse(param.Replace("/l:", string.Empty)));
+
+                if (param.StartsWith("/r:")) iRecargas = Math.Max(iRecargas, int.Parse(param.Replace("/r:", string.Empty)));
+
+                if (param.StartsWith("/s:")) fatorSujeira = Math.Max(fatorSujeira, double.Parse(param.Replace("/s:", string.Empty)));
+
+                if (param.StartsWith("/c:")) iRepositorio = Math.Max(iRepositorio, int.Parse(param.Replace("/c:", string.Empty)));
+
+            }
+
             var lixeiras = new List<Lixeira>(iLixeiras);
-            for (int i = 0; i < iLixeiras; i++)
-            {
-                lixeiras.Add(new Lixeira());
-            }
+            for (var i = 0; i < iLixeiras; i++) lixeiras.Add(new Lixeira());
 
-            int iRecargas = 1; // Pontos de Recargas
-            if (args.Length > 2) iRecargas = Math.Max(iRecargas, int.Parse(args[2]));
             var recargas = new List<Recarga>(iRecargas);
-            for (int i = 0; i < iRecargas; i++)
-            {
-                recargas.Add(new Recarga());
-            }
+            for (var i = 0; i < iRecargas; i++) recargas.Add(new Recarga());
 
-            double fatorSujeira = 0.1; // Sujeira
-            if (args.Length > 3) fatorSujeira = Math.Max(fatorSujeira, double.Parse(args[3]));
-            var qntSujeiras = TAM * TAM * fatorSujeira;
-            var sujeiras = new List<Sujeira>((int)qntSujeiras);
-            for (int i = 0; i < qntSujeiras; i++)
-            {
-                sujeiras.Add(new Sujeira());
-            }
+            
+            var agente = new Agente(iRepositorio);
 
-            Console.WriteLine("Inteligência Artificial T1");
-            Console.WriteLine($"TAMANHO: {TAM}");
+            var ambiente = new Models.Ambiente(iTamanho, agente, lixeiras, recargas, fatorSujeira);
 
-            var agente = new Agente();
-
-            var a = new Models.Ambiente(TAM, agente, lixeiras, recargas, sujeiras);
-
-            Console.WriteLine(a);
+            Console.WriteLine(ambiente);
 
             agente.Run();
 

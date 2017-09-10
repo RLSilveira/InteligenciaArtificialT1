@@ -6,11 +6,11 @@ namespace InteligenciaArtificialT1
 {
     public class Sujeira
     {
-        public int count { get; private set; } = 1;
+        public int peso { get; private set; } = 1;
 
         public Sujeira(int valor)
         {
-            count = valor;
+            peso = valor;
         }
 
         public Sujeira()

@@ -10,21 +10,21 @@ namespace InteligenciaArtificialT1
     public class Agente
     {
 
-        public int CapacidadeBateria { get; set; }
+        public int CapacidadeBateria = 50;
+        public int CapacidadeRepositorio;
+
         public int Bateria { get; set; }
-        public int CapacidadeRepositorio { get; private set; }
-        public int UltimaCelula { get; set; }
-
-
         public int Repositorio { get; set; }
+
+
+        public int UltimaCelula { get; set; }
         public Ambiente Ambiente { get; set; }
 
-        public Agente()
+        public Agente(int capacidadeRepositorio)
         {
-
+            CapacidadeRepositorio = capacidadeRepositorio;
+            Bateria = CapacidadeBateria;
         }
-
-
 
         public void Run()
         {
@@ -40,6 +40,16 @@ namespace InteligenciaArtificialT1
 
             while (true)
             {
+
+                if (Bateria < CapacidadeBateria * 0.1) // 10 %
+                {
+                    Recarregar();
+                }
+
+                if (Repositorio == CapacidadeRepositorio)
+                {
+                    Esvaziar();
+                }
 
                 if (bDesce)
                 {
@@ -96,14 +106,6 @@ namespace InteligenciaArtificialT1
                 }
 
             }
-
-
-
-            // Verifica capacidade
-
-            // Verifica bateria
-
-            // Move para proxima casa
 
         }
 
@@ -227,6 +229,82 @@ namespace InteligenciaArtificialT1
         public override string ToString()
         {
             return "A";
+        }
+
+
+        private void Esvaziar()
+        {
+            // Buscar pontos proximos as lixeiras
+            var list = new HashSet<Ambiente.Ponto>();
+
+            foreach (var l in Ambiente.Lixeiras)
+            {
+                var ccc = Ambiente.getAdjascentes(l.X, l.Y);
+                foreach (var adjascente in ccc)
+                {
+                    list.Add(adjascente);
+                }
+            }
+
+            // Buscar caminho para o mais proximo
+            var path = AStar(list);
+
+            // vai
+            for (int i = 0; i < path.Count; i++)
+            {
+                Ambiente.Move(path[i]);
+            }
+
+            //volta
+            for (int i = path.Count - 1; i >= 0; i--)
+            {
+                Ambiente.Move(path[i]);
+            }
+
+        }
+
+        private void Recarregar()
+        {
+            // Buscar pontos proximos as lixeiras
+            var list = new HashSet<Ambiente.Ponto>();
+
+            foreach (var l in Ambiente.Recargas)
+            {
+                var ccc = Ambiente.getAdjascentes(l.X, l.Y);
+                foreach (var adjascente in ccc)
+                {
+                    list.Add(adjascente);
+                }
+            }
+
+            // Buscar caminho para o mais proximo
+            var path = AStar(list);
+
+            // vai
+            for (int i = 0; i < path.Count; i++)
+            {
+                Ambiente.Move(path[i]);
+            }
+
+            //volta
+            for (int i = path.Count - 1; i >= 0; i--)
+            {
+                Ambiente.Move(path[i]);
+            }
+        }
+
+        List<Ambiente.Ponto> AStar(IEnumerable<Ambiente.Ponto> pontosDestinosList)
+        {
+            var valor = int.MaxValue;
+            List<Ambiente.Ponto> path = null;
+
+            foreach (var ponto in pontosDestinosList)
+            {
+                
+            }
+
+
+            return path;
         }
     }
 }
