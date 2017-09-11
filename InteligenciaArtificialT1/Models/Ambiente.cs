@@ -69,7 +69,7 @@ namespace InteligenciaArtificialT1.Models
             int row2 = col2;
 
             int c1, c2;
-            for (c1 = col1, c2 = col2; c1 < col1 + aux; c1++, c2--)
+            for (c1 = col1 + aux -2, c2 = col2 - aux + 2; c1 < col1 + aux; c1++, c2--)
             {
                 mapa[(row1 * tam) + c1] = new Ponto(row1, c1, new Parede());
                 mapa[(row2 * tam) + c1] = new Ponto(row2, c1, new Parede());
