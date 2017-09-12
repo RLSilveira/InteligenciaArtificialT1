@@ -158,7 +158,7 @@ namespace InteligenciaArtificialT1.Models
 
             Console.Clear();
             Console.WriteLine(this);
-            System.Threading.Thread.Sleep(100);
+            System.Threading.Thread.Sleep(150);
 
         }
 

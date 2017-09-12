@@ -13,7 +13,8 @@ namespace InteligenciaArtificialT1
             var iLixeiras = 1; // Lixeiras
             var iRecargas = 1; // Pontos de Recargas
             var fatorSujeira = 0.1; // Sujeira
-            var iRepositorio = 10; // Capacidade da Bateria
+            var iRepositorio = 10; // Capacidade do Repositório
+            var iBateria = 10; // Capacidade da Bateria
 
 
 
@@ -30,6 +31,8 @@ namespace InteligenciaArtificialT1
 
                 if (param.StartsWith("/c:")) iRepositorio = Math.Max(iRepositorio, int.Parse(param.Replace("/c:", string.Empty)));
 
+                if (param.StartsWith("/b:")) iBateria = Math.Max(iBateria, int.Parse(param.Replace("/b:", string.Empty)));
+
             }
 
             var lixeiras = new List<Lixeira>(iLixeiras);
@@ -39,7 +42,7 @@ namespace InteligenciaArtificialT1
             for (var i = 0; i < iRecargas; i++) recargas.Add(new Recarga());
 
             
-            var agente = new Agente(iRepositorio);
+            var agente = new Agente(iRepositorio, iBateria);
 
             var ambiente = new Models.Ambiente(iTamanho, agente, lixeiras, recargas, fatorSujeira);
 
