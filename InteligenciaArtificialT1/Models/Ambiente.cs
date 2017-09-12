@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Security.Cryptography.X509Certificates;
 
 namespace InteligenciaArtificialT1.Models
 {
@@ -34,53 +31,54 @@ namespace InteligenciaArtificialT1.Models
 
         }
 
-        int tam;
-        Ponto[] mapa;
+        int _tam;
+        Ponto[] _mapa;
 
-        public int getTamanho() { return mapa.Count(x => x == null || x.Item is null || x.Item is Sujeira); }
+        public int GetTamanho() { return _mapa.Count(x => x == null || x.Item is null || x.Item is Sujeira); }
 
         public List<Ponto> Recargas { get; private set; }
         public List<Ponto> Lixeiras { get; private set; }
 
-        Ponto pAgente;
+        Ponto _pAgente;
 
-        public Ambiente(int tamanho, Agente agente, List<Lixeira> lixeiras, List<Recarga> recargas, double fatorSujeira)
+        private bool bSleep;
+        public Ambiente(int tamanho, Agente agente, List<Lixeira> lixeiras, List<Recarga> recargas, double fatorSujeira, bool sleep)
         {
 
-
+            bSleep = sleep;
 
             Recargas = new List<Ponto>(recargas.Count);
             Lixeiras = new List<Ponto>(lixeiras.Count);
 
-            tam = tamanho;
-            mapa = new Ponto[tam * tam];
+            _tam = tamanho;
+            _mapa = new Ponto[_tam * _tam];
 
             // Inicializa agente
-            this.pAgente = mapa[0] = new Ponto(0, 0, agente);
+            this._pAgente = _mapa[0] = new Ponto(0, 0, agente);
             agente.Ambiente = this;
 
 
             // Inicializa paredes
-            int aux = tam / 3 / 2;
+            int aux = _tam / 3 / 2;
             int col1 = aux;
-            int col2 = tam - aux - 1;
+            int col2 = _tam - aux - 1;
 
             int row1 = col1;
             int row2 = col2;
 
             int c1, c2;
-            for (c1 = col1 + aux -2, c2 = col2 - aux + 2; c1 < col1 + aux; c1++, c2--)
+            for (c1 = col1 + aux - 2, c2 = col2 - aux + 2; c1 < col1 + aux; c1++, c2--)
             {
-                mapa[(row1 * tam) + c1] = new Ponto(row1, c1, new Parede());
-                mapa[(row2 * tam) + c1] = new Ponto(row2, c1, new Parede());
-                mapa[(row1 * tam) + c2] = new Ponto(row1, c2, new Parede());
-                mapa[(row2 * tam) + c2] = new Ponto(row2, c2, new Parede());
+                _mapa[(row1 * _tam) + c1] = new Ponto(row1, c1, new Parede());
+                _mapa[(row2 * _tam) + c1] = new Ponto(row2, c1, new Parede());
+                _mapa[(row1 * _tam) + c2] = new Ponto(row1, c2, new Parede());
+                _mapa[(row2 * _tam) + c2] = new Ponto(row2, c2, new Parede());
             }
             c1--; c2++;
             for (int r = row1 + 1; r < row2; r++)
             {
-                mapa[(r * tam) + c1] = new Ponto(r, c1, new Parede());
-                mapa[(r * tam) + c2] = new Ponto(r, c2, new Parede());
+                _mapa[(r * _tam) + c1] = new Ponto(r, c1, new Parede());
+                _mapa[(r * _tam) + c2] = new Ponto(r, c2, new Parede());
             }
 
             var random = new Random();
@@ -88,49 +86,49 @@ namespace InteligenciaArtificialT1.Models
             //TODO: Gerar lixeiras e recargas apenas dentro das paredes
             // gerar lixeiras
             int idx = 0;
-            while (idx < lixeiras.Count && !isFull)
+            while (idx < lixeiras.Count && !IsFull)
             {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == tam - 1) && r > row1 && r < row2)
+                var r = random.Next(_tam);
+                var c = random.Next(_tam);
+                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == _tam - 1) && r > row1 && r < row2)
                 {
-                    if (mapa[(r * tam) + c] == null)
+                    if (_mapa[(r * _tam) + c] == null)
                     {
-                        Lixeiras.Add(mapa[(r * tam) + c] = new Ponto(r, c, lixeiras[idx++]));
+                        Lixeiras.Add(_mapa[(r * _tam) + c] = new Ponto(r, c, lixeiras[idx++]));
                     }
                 }
             }
 
             // gerar recargas
             idx = 0;
-            while (idx < recargas.Count && !isFull)
+            while (idx < recargas.Count && !IsFull)
             {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == tam - 1) && r > row1 && r < row2)
+                var r = random.Next(_tam);
+                var c = random.Next(_tam);
+                if ((c == c1 - 1 || c == c2 + 1 || c == 0 || c == _tam - 1) && r > row1 && r < row2)
                 {
-                    if (mapa[(r * tam) + c] == null)
+                    if (_mapa[(r * _tam) + c] == null)
                     {
-                        Recargas.Add(mapa[(r * tam) + c] = new Ponto(r, c, recargas[idx++]));
+                        Recargas.Add(_mapa[(r * _tam) + c] = new Ponto(r, c, recargas[idx++]));
                         ;
                     }
                 }
             }
 
             // gerar sujeiras
-            var qntSujeiras = mapa.Count(x => x == null) * fatorSujeira;
+            var qntSujeiras = _mapa.Count(x => x == null) * fatorSujeira;
             var sujeiras = new List<Sujeira>((int)qntSujeiras);
             for (var i = 0; i < qntSujeiras; i++) sujeiras.Add(new Sujeira());
 
 
             idx = 0;
-            while (idx < sujeiras.Count && !isFull)
+            while (idx < sujeiras.Count && !IsFull)
             {
-                var r = random.Next(tam);
-                var c = random.Next(tam);
-                if (mapa[(r * tam) + c] == null)
+                var r = random.Next(_tam);
+                var c = random.Next(_tam);
+                if (_mapa[(r * _tam) + c] == null)
                 {
-                    mapa[(r * tam) + c] = new Ponto(r, c, sujeiras[idx++]);
+                    _mapa[(r * _tam) + c] = new Ponto(r, c, sujeiras[idx++]);
                 }
             }
 
@@ -145,32 +143,36 @@ namespace InteligenciaArtificialT1.Models
                 case Lixeira _:
                     throw new Exception("Não deveria chega aqui");
                 case Sujeira s:
-                    ((Agente)pAgente.Item).Repositorio += s.peso;
+                    ((Agente)_pAgente.Item).Repositorio += s.Peso;
                     break;
             }
 
-            ((Agente)pAgente.Item).Bateria -= 1;
+            ((Agente)_pAgente.Item).Bateria -= 1;
 
-            mapa[pAgente.X * tam + pAgente.Y] = new Ponto(pAgente.X, pAgente.Y, null);
-            mapa[node.X * tam + node.Y] = pAgente;
-            pAgente.X = node.X;
-            pAgente.Y = node.Y;
+            _mapa[_pAgente.X * _tam + _pAgente.Y] = new Ponto(_pAgente.X, _pAgente.Y, null);
+            _mapa[node.X * _tam + node.Y] = _pAgente;
+            _pAgente.X = node.X;
+            _pAgente.Y = node.Y;
 
             Console.Clear();
             Console.WriteLine(this);
-            System.Threading.Thread.Sleep(150);
+
+            if (bSleep)
+            {
+                System.Threading.Thread.Sleep(150);
+            }
 
         }
 
-        public List<Ponto> getAdjascentes(int x, int y)
+        public List<Ponto> GetAdjascentes(int x, int y)
         {
             var nodes = new List<Ponto>(8);
 
-            for (int i = Math.Max(0, x - 1); i < Math.Min(x + 2, tam); i++)
+            for (int i = Math.Max(0, x - 1); i < Math.Min(x + 2, _tam); i++)
             {
-                for (int j = Math.Max(0, y - 1); j < Math.Min(y + 2, tam); j++)
+                for (int j = Math.Max(0, y - 1); j < Math.Min(y + 2, _tam); j++)
                 {
-                    var n = mapa[(i * tam) + j];
+                    var n = _mapa[(i * _tam) + j];
 
                     if (i == x && j == y) continue;
 
@@ -186,73 +188,70 @@ namespace InteligenciaArtificialT1.Models
         }
 
 
-        public Ponto getDireita() => getVizinho(0, 1);
-        public Ponto getEsquerda() => getVizinho(0, -1);
+        public Ponto GetDireita() => GetVizinho(0, 1);
+        public Ponto GetEsquerda() => GetVizinho(0, -1);
 
-        public Ponto getCima() => getVizinho(-1, 0);
-        public Ponto getBaixo() => getVizinho(1, 0);
+        public Ponto GetCima() => GetVizinho(-1, 0);
+        public Ponto GetBaixo() => GetVizinho(1, 0);
 
-        public Ponto getCimaEsquerda() => getVizinho(-1, -1);
-        public Ponto getBaixoEsquerda() => getVizinho(1, -1);
+        public Ponto GetCimaEsquerda() => GetVizinho(-1, -1);
+        public Ponto GetBaixoEsquerda() => GetVizinho(1, -1);
 
-        public Ponto getCimaDireita() => getVizinho(-1, 1);
-        public Ponto getBaixoDireita() => getVizinho(1, 1);
+        public Ponto GetCimaDireita() => GetVizinho(-1, 1);
+        public Ponto GetBaixoDireita() => GetVizinho(1, 1);
 
-        private Ponto getVizinho(int offsetX, int offsetY)
+        private Ponto GetVizinho(int offsetX, int offsetY)
         {
-            var x = pAgente.X + offsetX;
-            var y = pAgente.Y + offsetY;
+            var x = _pAgente.X + offsetX;
+            var y = _pAgente.Y + offsetY;
 
-            if (x < 0 || x >= tam || y < 0 || y >= tam) return null;
+            if (x < 0 || x >= _tam || y < 0 || y >= _tam) return null;
 
-            return mapa[(x * tam) + y] ?? new Ponto(pAgente.X + offsetX, pAgente.Y + offsetY, null);
+            return _mapa[(x * _tam) + y] ?? new Ponto(_pAgente.X + offsetX, _pAgente.Y + offsetY, null);
         }
 
-        public Ponto[] getAdjscentesOrdenados(bool bInvert)
+        public Ponto[] GetAdjscentesOrdenados(bool bInvert)
         {
-
-            //return new[] {getCima()};
-
             var r = bInvert
                 ? new[]
                 {
-                    getBaixo(),
-                    getCima(),
-                    getDireita(),
+                    GetBaixo(),
+                    GetCima(),
+                    GetDireita(),
                 }
                 : new[]
                 {
-                    getCima(),
-                    getBaixo(),
-                    getEsquerda(),
+                    GetCima(),
+                    GetBaixo(),
+                    GetEsquerda(),
                 };
             return r;
         }
 
-        private bool isFull => mapa.Count(x => x == null) == 0;
+        private bool IsFull => _mapa.Count(x => x == null) == 0;
 
         public override string ToString()
         {
-            var r = "Inteligencia Artificial\n" +
-                    "Caetano\n" +
-                    "Pedro\n" +
-                    "Rodrigo\n" +
+            var r = "Inteligencia Artificial - T1\n" +
+                    " Caetano Araujo\n" +
+                    " Pedro Fraga\n" +
+                    " Rodrigo Leão\n" +
                     "\n\t";
 
-            for (int i = 0; i < tam; i++)
+            for (var i = 0; i < _tam; i++)
             {
-                for (int j = 0; j < tam; j++)
+                for (var j = 0; j < _tam; j++)
                 {
-                    r += $" {mapa[(i * tam) + j]?.ToString() ?? "-"} ";
+                    r += $"{_mapa[(i * _tam) + j]?.ToString() ?? " - "}";
                 }
 
                 r += "\n\t";
 
             }
 
-            var agente = (Agente)pAgente.Item;
+            var agente = (Agente)_pAgente.Item;
 
-            r += "\nInfos\n";
+            r += "\nInfos do Sistema\n";
             r += $"Bateria:     {agente.Bateria}/{agente.CapacidadeBateria}\n";
             r += $"Repositorio: {agente.Repositorio}/{agente.CapacidadeRepositorio}\n";
 
@@ -261,9 +260,9 @@ namespace InteligenciaArtificialT1.Models
         }
 
 
-        public Ponto getAgentePosicao()
+        public Ponto GetAgentePosicao()
         {
-            return pAgente;
+            return _pAgente;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 
 namespace InteligenciaArtificialT1
 {
@@ -15,6 +15,8 @@ namespace InteligenciaArtificialT1
             var fatorSujeira = 0.1; // Sujeira
             var iRepositorio = 10; // Capacidade do Repositório
             var iBateria = 10; // Capacidade da Bateria
+
+            var bSleep = true; // Sleep sim ou não
 
 
 
@@ -33,6 +35,8 @@ namespace InteligenciaArtificialT1
 
                 if (param.StartsWith("/b:")) iBateria = Math.Max(iBateria, int.Parse(param.Replace("/b:", string.Empty)));
 
+                if (param.StartsWith("/noSleep")) bSleep = false;
+
             }
 
             var lixeiras = new List<Lixeira>(iLixeiras);
@@ -40,15 +44,22 @@ namespace InteligenciaArtificialT1
 
             var recargas = new List<Recarga>(iRecargas);
             for (var i = 0; i < iRecargas; i++) recargas.Add(new Recarga());
-
             
             var agente = new Agente(iRepositorio, iBateria);
 
-            var ambiente = new Models.Ambiente(iTamanho, agente, lixeiras, recargas, fatorSujeira);
+            var ambiente = new Models.Ambiente(iTamanho, agente, lixeiras, recargas, fatorSujeira, bSleep);
 
             Console.WriteLine(ambiente);
 
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             agente.Run();
+
+            stopWatch.Stop();
+            TimeSpan ts = stopWatch.Elapsed;
+
+            Console.WriteLine("Elapsed: " + ts);
 
             Console.WriteLine("Fim !!!");
             Console.ReadKey();

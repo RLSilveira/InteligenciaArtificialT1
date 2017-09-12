@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace InteligenciaArtificialT1
+﻿namespace InteligenciaArtificialT1
 {
     public class Sujeira
     {
-        public int peso { get; private set; } = 1;
+        public int Peso { get; private set; } = 1;
 
         public Sujeira(int valor)
         {
-            peso = valor;
+            Peso = valor;
         }
 
         public Sujeira()
@@ -19,7 +15,7 @@ namespace InteligenciaArtificialT1
 
         public override string ToString()
         {
-            return "s";
+            return " s ";
         }
     }
 

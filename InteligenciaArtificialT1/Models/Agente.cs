@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
 using InteligenciaArtificialT1.Models;
 
 namespace InteligenciaArtificialT1
@@ -10,15 +8,18 @@ namespace InteligenciaArtificialT1
     public class Agente
     {
 
-        public int CapacidadeBateria = 50;
-        public int CapacidadeRepositorio;
+        public int CapacidadeBateria = 20;
+        public int CapacidadeRepositorio = 20;
 
         public int Bateria { get; set; }
         public int Repositorio { get; set; }
+        public bool IsRepositorioFull => Repositorio >= CapacidadeRepositorio;
 
 
         public int UltimaCelula { get; set; }
         public Ambiente Ambiente { get; set; }
+
+        public bool AEstrelaMode { get; set; }= false;
 
         public Agente(int capacidadeRepositorio, int capacidadeBateria)
         {
@@ -28,15 +29,8 @@ namespace InteligenciaArtificialT1
 
         public void Run()
         {
-            var bDireita = true;
-            var tam = Ambiente.getTamanho();
 
-            Ambiente.Ponto ultimaPosicao = Ambiente.getAgentePosicao();
-
-            int col = ultimaPosicao.X;
             var bDesce = true;
-
-            Ambiente.Ponto p = null;
 
             while (true)
             {
@@ -51,14 +45,15 @@ namespace InteligenciaArtificialT1
                     Esvaziar();
                 }
 
+                Ambiente.Ponto p = null;
                 if (bDesce)
                 {
-                    p = Ambiente.getBaixo();
+                    p = Ambiente.GetBaixo();
 
                     if (p == null)
                     {
                         // fim do mapa
-                        p = Ambiente.getDireita();
+                        p = Ambiente.GetDireita();
                         bDesce = false;
 
                         if (p == null)
@@ -74,18 +69,17 @@ namespace InteligenciaArtificialT1
                         continue;
                     }
 
-                    ultimaPosicao = p;
                     Ambiente.Move(p);
 
                 }
                 else
                 {
-                    p = Ambiente.getCima();
+                    p = Ambiente.GetCima();
 
                     if (p == null)
                     {
                         // fim do mapa
-                        p = Ambiente.getDireita();
+                        p = Ambiente.GetDireita();
                         bDesce = true;
 
                         if (p == null)
@@ -101,7 +95,6 @@ namespace InteligenciaArtificialT1
                         continue;
                     }
 
-                    ultimaPosicao = p;
                     Ambiente.Move(p);
                 }
 
@@ -111,30 +104,30 @@ namespace InteligenciaArtificialT1
 
         void Contornar(bool bDesce)
         {
-            bool esquerda = true;
+            bool esquerda;
             if (bDesce)
             {
-                var p = Ambiente.getBaixoEsquerda();
+                var p = Ambiente.GetBaixoEsquerda();
                 esquerda = true;
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
-                    p = Ambiente.getBaixoDireita();
+                    p = Ambiente.GetBaixoDireita();
                 }
-
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = true;
-                    p = Ambiente.getEsquerda();
+                    p = Ambiente.GetEsquerda();
                 }
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
-                    p = Ambiente.getDireita();
+                    p = Ambiente.GetDireita();
                 }
+
 
                 Ambiente.Move(p);
 
@@ -142,10 +135,10 @@ namespace InteligenciaArtificialT1
                 if (!esquerda)
                 {
                     DescendoVoltaEsquerda:
-                    p = Ambiente.getBaixoEsquerda();
+                    p = Ambiente.GetBaixoEsquerda();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
-                        p = Ambiente.getBaixo();
+                        p = Ambiente.GetBaixo();
                         Ambiente.Move(p);
                         goto DescendoVoltaEsquerda;
                     }
@@ -153,10 +146,10 @@ namespace InteligenciaArtificialT1
                 else
                 {
                     DescendoVoltaDireita:
-                    p = Ambiente.getBaixoDireita();
+                    p = Ambiente.GetBaixoDireita();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
-                        p = Ambiente.getBaixo();
+                        p = Ambiente.GetBaixo();
                         Ambiente.Move(p);
                         goto DescendoVoltaDireita;
                     }
@@ -168,25 +161,25 @@ namespace InteligenciaArtificialT1
             }
             else // Sobe
             {
-                var p = Ambiente.getCimaEsquerda();
+                var p = Ambiente.GetCimaEsquerda();
                 esquerda = true;
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
-                    p = Ambiente.getCimaDireita();
+                    p = Ambiente.GetCimaDireita();
                 }
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
-                    p = Ambiente.getEsquerda();
+                    p = Ambiente.GetEsquerda();
                     esquerda = true;
                 }
 
                 if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                 {
                     esquerda = false;
-                    p = Ambiente.getDireita();
+                    p = Ambiente.GetDireita();
                 }
 
 
@@ -196,10 +189,10 @@ namespace InteligenciaArtificialT1
                 if (!esquerda)
                 {
                     SubindoVoltaEsquerda:
-                    p = Ambiente.getCimaEsquerda();
+                    p = Ambiente.GetCimaEsquerda();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
-                        p = Ambiente.getCima();
+                        p = Ambiente.GetCima();
                         Ambiente.Move(p);
                         goto SubindoVoltaEsquerda;
                     }
@@ -207,10 +200,10 @@ namespace InteligenciaArtificialT1
                 else
                 {
                     SubindoVoltaDireita:
-                    p = Ambiente.getCimaDireita();
+                    p = Ambiente.GetCimaDireita();
                     if (p == null || p.Item is Recarga || p.Item is Lixeira || p.Item is Parede)
                     {
-                        p = Ambiente.getCima();
+                        p = Ambiente.GetCima();
                         Ambiente.Move(p);
                         goto SubindoVoltaDireita;
                     }
@@ -218,13 +211,14 @@ namespace InteligenciaArtificialT1
                 }
 
                 Ambiente.Move(p);
+
             }
         }
 
 
         public override string ToString()
         {
-            return "A";
+            return AEstrelaMode ? " A*" : " A ";
         }
 
 
@@ -235,12 +229,14 @@ namespace InteligenciaArtificialT1
 
             foreach (var l in Ambiente.Lixeiras)
             {
-                var ccc = Ambiente.getAdjascentes(l.X, l.Y);
+                var ccc = Ambiente.GetAdjascentes(l.X, l.Y);
                 foreach (var adjascente in ccc)
                 {
                     list.Add(adjascente);
                 }
             }
+
+            AEstrelaMode = true;
 
             // Buscar caminho para o mais proximo
             var path = GetMenorCaminho(list);
@@ -259,6 +255,9 @@ namespace InteligenciaArtificialT1
             {
                 Ambiente.Move(path[i]);
             }
+
+            AEstrelaMode = false;
+
         }
 
         private void Recarregar()
@@ -268,12 +267,14 @@ namespace InteligenciaArtificialT1
 
             foreach (var l in Ambiente.Recargas)
             {
-                var ccc = Ambiente.getAdjascentes(l.X, l.Y);
+                var ccc = Ambiente.GetAdjascentes(l.X, l.Y);
                 foreach (var adjascente in ccc)
                 {
                     list.Add(adjascente);
                 }
             }
+
+            AEstrelaMode = true;
 
             // Buscar caminho para o mais proximo
             var path = GetMenorCaminho(list);
@@ -291,6 +292,9 @@ namespace InteligenciaArtificialT1
             {
                 Ambiente.Move(path[i]);
             }
+
+            AEstrelaMode = false;
+
         }
 
         List<Ambiente.Ponto> GetMenorCaminho(IEnumerable<Ambiente.Ponto> pontosDestinosList)
@@ -312,20 +316,20 @@ namespace InteligenciaArtificialT1
 
         private class NodoEstrela
         {
-            public int x;
-            public int y;
-            public int f => g + h;
-            public int g;
-            public int h;
+            public int X;
+            public int Y;
+            public int F => G + H;
+            public int G; // Custo
+            public int H; // Heuristica
 
-            public NodoEstrela pai;
+            public NodoEstrela Pai;
 
             public NodoEstrela(Ambiente.Ponto ponto)
             {
-                x = ponto.X;
-                y = ponto.Y;
-                g = h = 0;
-                pai = null;
+                X = ponto.X;
+                Y = ponto.Y;
+                G = H = 0;
+                Pai = null;
             }
         }
 
@@ -334,7 +338,7 @@ namespace InteligenciaArtificialT1
             var aberta = new List<NodoEstrela>();
             var fechada = new List<NodoEstrela>();
 
-            aberta.Add(new NodoEstrela(Ambiente.getAgentePosicao()));
+            aberta.Add(new NodoEstrela(Ambiente.GetAgentePosicao()));
 
             while (true)
             {
@@ -343,11 +347,11 @@ namespace InteligenciaArtificialT1
                     throw new Exception("Não encontramos caminho");
                 }
 
-                var atual = aberta.OrderBy(x => x.f).First();
+                var atual = aberta.OrderBy(x => x.F).First();
                 aberta.Remove(atual);
                 fechada.Add(atual);
 
-                if (atual.x == pDest.X && atual.y == pDest.Y)
+                if (atual.X == pDest.X && atual.Y == pDest.Y)
                 {
                     // Achei!! Montar caminho retorno
                     var ret = new List<Ambiente.Ponto>();
@@ -355,15 +359,15 @@ namespace InteligenciaArtificialT1
                     var r = fechada.Last();
                     while (r != null)
                     {
-                        ret.Insert(0, new Ambiente.Ponto(r.x, r.y, null));
-                        r = r.pai;
+                        ret.Insert(0, new Ambiente.Ponto(r.X, r.Y, null));
+                        r = r.Pai;
                     }
 
                     return ret;
 
                 }
 
-                foreach (var vizinho in Ambiente.getAdjascentes(atual.x, atual.y))
+                foreach (var vizinho in Ambiente.GetAdjascentes(atual.X, atual.Y))
                 {
 
                     if (!(vizinho.Item == null || vizinho.Item is Sujeira))
@@ -371,32 +375,33 @@ namespace InteligenciaArtificialT1
                         continue;
                     }
 
-                    int g = atual.g + 1;
+                    int novoG = atual.G + 1;
 
-                    var find = aberta.Find(x => x.x == vizinho.X && x.y == vizinho.Y);
-                    if (find == null)
+                    var nodoJaVisitado = aberta.Find(x => x.X == vizinho.X && x.Y == vizinho.Y);
+                    if (nodoJaVisitado == null)
                     {
-                        var v = new NodoEstrela(vizinho);
-                        v.h = Heuristica(vizinho.X, vizinho.Y, pDest.X, pDest.Y);
-                        v.g = g;
-                        v.pai = atual;
-                        aberta.Add(v);
+                        var novoNodo =
+                            new NodoEstrela(vizinho)
+                            {
+                                H = Heuristica(vizinho.X, vizinho.Y, pDest.X, pDest.Y),
+                                G = novoG,
+                                Pai = atual
+                            };
+                        aberta.Add(novoNodo);
                     }
-                    else if (find.g > g)
+                    else if (nodoJaVisitado.G > novoG)
                     {
-                        find.g = g;
-                        find.pai = atual;
+                        // Atualiza Custo
+                        nodoJaVisitado.G = novoG;
+                        nodoJaVisitado.Pai = atual;
                     }
 
                 }
 
             }
-
-            return null;
-
         }
 
-        private int Heuristica(int posX, int posY, int goalX, int goalY)
+        private static int Heuristica(int posX, int posY, int goalX, int goalY)
         {
             return Math.Abs(Math.Abs(goalX - posX) + Math.Abs(goalY - posY));
 

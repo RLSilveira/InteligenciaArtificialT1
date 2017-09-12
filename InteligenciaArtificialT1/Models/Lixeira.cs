@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace InteligenciaArtificialT1
+﻿namespace InteligenciaArtificialT1
 {
     public class Lixeira
     {
@@ -21,7 +17,7 @@ namespace InteligenciaArtificialT1
 
         public override string ToString()
         {
-            return "L";
+            return " L ";
         }
     }
 }

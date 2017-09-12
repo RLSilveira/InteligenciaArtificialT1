@@ -2,7 +2,7 @@
   "profiles": {
     "InteligenciaArtificialT1": {
       "commandName": "Project",
-      "commandLineArgs": "/n:12 /l:3 /r:3 /c:40 /b:40 /s:0,7"
+      "commandLineArgs": "/n:12 /l:3 /r:3 /c:20 /b:20 /s:0,7 /noSleep"
     }
   }
 }

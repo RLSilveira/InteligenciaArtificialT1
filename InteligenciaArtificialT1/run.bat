@@ -1,1 +1,1 @@
-dotnet bin\Debug\netcoreapp1.1\InteligenciaArtificialT1.dll %1 %2 %3 %4
+dotnet InteligenciaArtificialT1.dll /n:12 /l:3 /r:3 /c:20 /b:20 /s:0,7
